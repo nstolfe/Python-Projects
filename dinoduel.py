@@ -4,24 +4,30 @@
 
 #Known Problems: 
 
-#Create at least two classes:
+#Create at least two classes: DONE
   #1.)Dinosaur
   #2.)Player
-#__init__ all classes
+#__init__ all classes DONE
 #Each class needs three attributes: ex: self.name, self.age, self.color:
-  #Dinosaur: #1) Attack, #2) Defense, #3) Health
-  #Player: #1) Active Dinosaur #2) Defeated Dinosaur #3) Dinosaur Name
+  #Dinosaur: #1) Attack, #2) Defense, #3) Health DONE
+  #Player: #1) Active Dinosaur #2) Defeated Dinosaur #3) Player Name
 #Each class needs three methods: ex: def change_color(self, color):
-  #Dinosaur: attack, lose health, heal
+  #Dinosaur: deal damage (attack), lose health, heal DONE
   #Player: Name Dinosaur, Revive dinosaur, check active dinosars? check defeated dinosaurs?
 #Each class needs to describe itself with __repr__(self):
-#Each class needs to have at least two instances (or class objects)
+#Each class needs to have at least two instances (or class objects) DONE
   #Dinosaur Class instances: T-rex and Stegosarus
   #Player Class instances: Player 1 and Player 2
-#The two classes need to interact with each other in some way
-  #Revive dinosaur
+#The two classes need to interact with each other in some way DONE
+  #Name Dinosaur
+
 #Additonal Ideas:
   #Use a while loop to check dinosaur hp and keep rotating between players to take actions?
+
+#Left to do:
+    #Create final two player attributes
+    #Create final two player methods
+    #Describe player class with __repr__
 
 import cowsay
 
@@ -69,13 +75,33 @@ class Dinosaur:
         return """Your dinosaur is a {species}.\nYour {species} has {health} hit points, {attack} attack power, {defense} defense power.""".format(species = self.species.title(), health = self.health, attack = self.attack, defense = self.defense)
 
  
-class Player:
+class Player(Dinosaur):
     def __init__(self, active_dinosaurs, defeated_dinosaurs, player = "Player 1"):
         self.active_dinosaurs = active_dinosaurs
         self.defeated_dinosaurs = defeated_dinosaurs
 
-    def name_dinosaur(self):
-        pass
+    def name_dinosaurs(self, Dinosaur, Dinosaur2):
+        if Dinosaur.species == "t-rex":
+            user_dino_name = input("Welcome to Dino Duel, Player 1. Player 1 you are the two T-rexes. Player 1, what would you like the name of your first t-rex to be? ")
+        else:
+            user_dino_name = input("Welcome to Dino Duel, Player 2. Player 2 you are the Stegosaruses. Player 2, what would you like the name of your first stegosaurus to be? ")
+        #Accounting for any user capitalization errors to the dinosaur name
+        dino_name = user_dino_name.title()
+
+        if Dinosaur.species == "t-rex":
+            user_dino2_name = input("Player 1, what would you like the name of your second t-rex to be? ")
+        else:
+            user_dino2_name = input("Player 2, what would you like the name of your second stegosaurus to be? ")
+        #Accounting for any user capitalization errors to the dinosaur name
+        dino2_name = user_dino2_name.title()
+        
+        #Returning the names of the dinosaurs to the terminal with the dinosaur text art
+        if Dinosaur.species == "t-rex":
+            print(cowsay.trex("The first T-rex is named " + dino_name))
+            print(cowsay.trex("The second T-rex is named " + dino2_name))
+        else:
+            print(cowsay.stegosaurus("The first Stegosarus is named " + dino_name))
+            print(cowsay.stegosaurus("The second Stegosarus is named " + dino2_name))
 
     def check_active_dinosaurs(self, active_dinosaurs):
         # for dinosaur in active_dinosaurs:
@@ -86,6 +112,9 @@ class Player:
     
     def revive_dinosaur(self):
         pass
+
+    def __repr__(self):
+        return super().__repr__()
 
 #Creating the dinosaurs that will duel
 trex1 = Dinosaur(100, 20, 600, "t-rex")
@@ -106,24 +135,8 @@ player_one = Player(player_one_dino_list, player_one_defeated_dinos, "Player 1")
 player_two = Player(player_two_dino_list, player_two_defeated_dinos, "Player 2")
 
 #The start of what will display in the terminal
-
-user_trex1_name = input("Welcome to Dino Duel, Player 1. Player 1 you are the two T-rexes. Player 1, what would you like the name of your first t-rex to be? ")
-user_stego1_name = input("Welcome to Dino Duel, Player 2. Player 2 you are the Stegosaruses. Player 2, what would you like the name of your first stegosaurus to be? ")
-#Accounting for any user capitalization errors to the dinosaur name
-trex1_name = user_trex1_name.title()
-stego1_name = user_stego1_name.title()
-
-user_trex2_name = input("Player 1, what would you like the name of your second t-rex to be? ")
-user_stego2_name = input("Player 2, what would you like the name of your second stegosaurus to be? ")
-#Accounting for any user capitalization errors to the dinosaur name
-trex2_name = user_trex2_name.title()
-stego2_name = user_stego2_name.title()
-
-#Returning the names of the dinosaurs to the terminal with the dinosaur text art
-print(cowsay.trex("The first T-rex is named " + trex1_name))
-print(cowsay.stegosaurus("The first Stegosarus is named " + stego1_name))
-print(cowsay.trex("The second T-rex is named " + trex2_name))
-print(cowsay.stegosaurus("The second Stegosarus is named " + stego2_name))
+player_one.name_dinosaurs(trex1, trex2)
+player_two.name_dinosaurs(stegosaurus1, stegosaurus2)
 
 #player_one.check_active_dinosaurs(player_one_dino_list)
 
@@ -140,3 +153,5 @@ stegosaurus1.heal_self()
 
 print(trex1)
 print(stegosaurus1)
+print(trex2)
+print(stegosaurus2)
