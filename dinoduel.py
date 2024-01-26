@@ -1,32 +1,3 @@
-#Project Requirements:
-
-#Create at least two classes: DONE
-  #1.)Dinosaur
-  #2.)Player
-
-#__init__ all classes DONE
-
-#Each class needs three attributes: ex: self.name, self.age, self.color:
-  #Dinosaur: #1) Attack, #2) Defense, #3) Health DONE
-  #Player: #1) Active Dinosaur #2) Defeated Dinosaur #3) Revival Tokens
-
-#Each class needs three methods: ex: def change_color(self, color):
-  #Dinosaur: deal damage (attack), lose health, heal DONE
-  #Player: Revive dinosaur, check active dinosars, check defeated dinosaurs
-
-#Each class needs to describe itself with __repr__(self):
-
-#Each class needs to have at least two instances (or class objects) DONE
-  #Dinosaur Class instances: T-rex and Stegosarus
-  #Player Class instances: Player 1 and Player 2
-
-#The two classes need to interact with each other in some way DONE
-  #Check active/defeated dinosaur
-
-#Left to do:
-    #Create final player method
-    #Describe player class with __repr__
-
 #Allows the text art of the dinosaurs that will be shown in the terminal when players name the dinosaurs.
     #Uses cowsay.trex() and cowsay.stegosaurus() to designate the T-rex and Stegosaurs art.
 import cowsay
@@ -39,7 +10,7 @@ class Dinosaur:
         self.name = name
         self.species = species
 
-    #Calculates and updates remaining health of the dinosaur.
+    #Calculates and updates remaining health of the dinosaur by subtracting the damage dealt from the deal_damage function.
     def lose_health(self, damage_dealt):
         self.health -= damage_dealt
         if self.species == "t-rex":
@@ -47,16 +18,14 @@ class Dinosaur:
         else:
             print("After the attack, the Stegosarus has {health} hit points remaining.".format(health = self.health))
 
-    #Calculates hit point loss for the update_health function.
-    def deal_damage(self):
-        if self.species == "t-rex":
-            damage_dealt = 40
-        else:
-            damage_dealt = 20
+    #Calculates hit point loss for the update_health function based on the dinosaur that is attacking and the dinosaur that is defending.
+    #This number will be passed into the lose_health function above to update the health of a dinosaur based on how much damage was dealt.
+    def deal_damage(self, Dinosaur):
+        damage_dealt = self.attack - Dinosaur.defense
         #Allows the damage calculated to be passed into the parameter for damage_dealt in the update_health function
         return damage_dealt
     
-    #Allows a non-defeated dinosaur to heal by 100HP.
+    #Allows a non-defeated dinosaur to heal by 100HP and update the remaining health.
     def heal_self(self):
         if self.species == "t-rex":
             if self.health > 0:
@@ -160,25 +129,37 @@ class Player(Dinosaur):
                 print("Your defeated dinosaurs are {dinosaur1} and {dinosaur2}. You currently have no active dinosaurs to duel with.".format(dinosaur1 = stego_name, dinosaur2 = stego2_name))
         elif len(defeated_dinosaurs) == 0:
             print("You have no defeated dinosaurs.")
+    
+    #This function will revive a dinosaur only if it has been defeated in battle and if a player has a revival token left.
+    #This function will inform a player if they are trying to revive a non-defeated dinosaur or if they're trying to revive a dinosaur
+    #without having any revival tokens left to use.
+    def revive_dinosaur(self, Dinosaur):
+        if self.revival_tokens == 1:
+            if Dinosaur.health <= 0:
+                Dinosaur.health += 300
+                self.revival_tokens -= 1
+                print("Your dinosaur was revived and now has {health} hit points remaining.".format(health = Dinosaur.health))
+            elif Dinosaur.health > 0:
+                print("You cannot revive a dinosaur that has not been defeated.")
+        elif self.revival_tokens == 0:
+            print("You are out of revival tokens and cannot revive any more dinosaurs.")
 
-    def revive_dinosaur(self):
-        pass
-
+    #Allows a player to check how many revival toekns they have left.
     def __repr__(self):
-        return super().__repr__()
+        return "You have {tokens} revival tokens remaining.".format(tokens = self.revival_tokens)
 
 #The start of what will display in the terminal.
 
-#Global variables that will contain the names of the dinosaurs designated by the player.
+#Variables that will contain the names of the dinosaurs designated by the player.
 trex_name = input("Welcome to Dino Duel, Player 1. Player 1 you are the two T-rexes. Player 1, what would you like the name of your first t-rex to be? ").title()
 trex2_name = input("Player 1, what would you like the name of your second t-rex to be? ").title()
 stego_name = input("Welcome to Dino Duel, Player 2. Player 2 you are the Stegosaruses. Player 2, what would you like the name of your first stegosaurus to be? ").title()
 stego2_name = input("Player 2, what would you like the name of your second stegosaurus to be? ").title()
 
 #Creating the dinosaur objects that will duel.
-trex1 = Dinosaur(100, 20, 600, trex_name, "t-rex")
+trex1 = Dinosaur(120, 20, 600, trex_name, "t-rex")
 stegosaurus1 = Dinosaur(40, 60, 1000, stego_name, "stegosarus")
-trex2 = Dinosaur(150, 70, 650, trex2_name, "t-rex")
+trex2 = Dinosaur(150, 30, 650, trex2_name, "t-rex")
 stegosaurus2 = Dinosaur(90, 110, 1050, stego2_name, "stegosarus")
 
 #Creating player list of active dinosaurs.
@@ -193,10 +174,13 @@ player_two_defeated_dinos = []
 player_one = Player(player_one_dino_list, player_one_defeated_dinos, 1)
 player_two = Player(player_two_dino_list, player_two_defeated_dinos, 1)
 
-print(cowsay.trex("The first T-rex is named " + trex_name))
-print(cowsay.trex("The second T-rex is named " + trex2_name))
-print(cowsay.stegosaurus("The first Stegosarus is named " + stego_name))
-print(cowsay.stegosaurus("The second Stegosarus is named " + stego2_name))
+#Using cowsay without the print function allows the input included after cowsay to be displayed in the terminal using the 
+#appropriate animal. Including print() before cowsay will result in "none" being printed after the text art as print(cowsay()) would expect
+#an output string by using print(cowsay.get_output_string('animal', 'text to output'))
+cowsay.trex("The first t-rex is named " + trex_name)
+cowsay.trex("The second t-rex is named " + trex2_name)
+cowsay.stegosaurus("The first stegosarus is named " + stego_name)
+cowsay.stegosaurus("The second stegosarus is named " + stego2_name)
 
 #Simulating a battle below:
 
@@ -205,6 +189,10 @@ print(trex1)
 print(stegosaurus1)
 print(trex2)
 print(stegosaurus2)
+
+#testing checking tokens before any tokens are used
+print(player_one)
+print(player_two)
 
 #testing active dinosaur function with all dinosaurs active
 player_one.check_active_dinosaurs(player_one_dino_list, player_one_defeated_dinos)
@@ -215,11 +203,14 @@ player_one.check_defeated_dinosaurs(player_one_defeated_dinos, player_one_dino_l
 player_two.check_defeated_dinosaurs(player_two_defeated_dinos, player_two_dino_list)
 
 #testing deal damage and lose health functions
-trex2.lose_health(stegosaurus1.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
+trex2.lose_health(stegosaurus1.deal_damage(trex2))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
 
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+
+#testing revive dinosaur function before a dinosaur can be revived
+player_two.revive_dinosaur(stegosaurus1)
 
 #testing heal self function
 trex1.heal_self()
@@ -228,41 +219,37 @@ trex2.heal_self()
 stegosaurus1.heal_self()
 stegosaurus2.heal_self()
 
-#Defeating a dinosaur to test active and defeated list when a dinosaur is defeated
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
-trex1.lose_health(stegosaurus2.deal_damage())
+#Defeating a dinosaur to test revive dinosaur function
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+
+#testing check defeated dinosaurs to confirm an error is not given after a dinosaur is revived. This test is used to confirm the
+#dinosaur was on the defeated list and is successfully removed after it is revived.
+player_one.check_defeated_dinosaurs(player_one_defeated_dinos, player_one_dino_list)
+
+#testing revive dinosaur function for Player 1 and checking if the revival tokens subtract successfully
+player_one.revive_dinosaur(trex1)
+player_one.revive_dinosaur(trex1)
+
+#testing check defeated dinosaurs to confirm an error is not given after a dinosaur is revived.
+player_one.check_defeated_dinosaurs(player_one_defeated_dinos, player_one_dino_list)
+
+#testing checking revival tokens after a token is used
+print(player_one)
+
+#Redefeating a dinosaur to test active and defeated list when a dinosaur is defeated
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
+trex1.lose_health(stegosaurus2.deal_damage(trex1))
 
 #testing check active dinosaurs after a dinosaur is defeated
 player_one.check_active_dinosaurs(player_one_dino_list, player_one_defeated_dinos)
@@ -271,67 +258,58 @@ player_one.check_active_dinosaurs(player_one_dino_list, player_one_defeated_dino
 player_one.check_defeated_dinosaurs(player_one_defeated_dinos, player_one_dino_list)
 
 #defeating a dinosaur from player two:
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
-stegosaurus2.lose_health(trex2.deal_damage())
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
+stegosaurus2.lose_health(trex2.deal_damage(stegosaurus2))
 
 #testing checking defeated dinosaurs before checking the active list
 player_two.check_defeated_dinosaurs(player_two_defeated_dinos, player_two_dino_list)
 player_two.check_active_dinosaurs(player_two_dino_list, player_two_defeated_dinos)
 
 #defeating all dinosuars for a player to test the check active and defeated dinosaurs after no active dinosaurs remain
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
-stegosaurus1.lose_health(trex1.deal_damage())
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
+stegosaurus1.lose_health(trex1.deal_damage(stegosaurus1))
 
 player_two.check_active_dinosaurs(player_two_dino_list, player_two_defeated_dinos)
 player_two.check_defeated_dinosaurs(player_two_defeated_dinos, player_two_dino_list)
@@ -339,8 +317,16 @@ player_two.check_defeated_dinosaurs(player_two_defeated_dinos, player_two_dino_l
 #testing heal self function afte a dinosaur is defeated
 stegosaurus1.heal_self()
 
+#testing revive dinosaur function for Player 2 and rechecking if the revival tokens subtract successfully
+player_two.revive_dinosaur(stegosaurus1)
+player_two.revive_dinosaur(stegosaurus1)
+
 #testing checking dinosaur stats after duel is over
 print(trex1)
 print(stegosaurus1)
 print(trex2)
 print(stegosaurus2)
+
+#testing checking revival tokens after all tokens have been used for all players
+print(player_one)
+print(player_two)
